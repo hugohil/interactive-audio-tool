@@ -39,18 +39,41 @@
           <input v-model="height" name="height" type="range" step=".01" min="0" max="1">
         </div>
       </div>
+      <div>
+        <h2>easings<a href="https://easings.net/fr" target="_blank">(ref)</a></h2>
+        <h3>easing gain</h3>
+        <select v-model="easeGain">
+          <option
+          v-for="(func, name) in easings"
+          :value="name">
+            {{ name }}
+          </option>
+        </select>
+        <h3>easing pan</h3>
+        <select v-model="easePan">
+          <option
+          v-for="(func, name) in easings"
+          :value="name">
+            {{ name }}
+          </option>
+        </select>
+      </div>
     </section>
   </div>
 </template>
 
 <script>
 import * as audio from '@/lib/audio'
+import easings from '@/lib/easings'
 import throttle from 'lodash.throttle'
 
 export default {
   name: 'App',
   data () {
     return {
+      easings,
+      easeGain: 'linear',
+      easePan: 'linear',
       mode: 'all',
       width: 1,
       height: 1,
@@ -77,8 +100,8 @@ export default {
     })
 
     const mouseHandler = throttle(({ target, clientX, clientY }) => {
-      this.gain = (1 - ((clientY - target.offsetTop) / target.clientHeight))
-      this.pan = ((((clientX - target.offsetLeft) / target.clientWidth) - .5) * 2)
+      this.gain = this.easings[this.easeGain](1 - ((clientY - target.offsetTop) / target.clientHeight))
+      this.pan = ((this.easings[this.easePan]((clientX - target.offsetLeft) / target.clientWidth) - .5) * 2)
 
       if (this.mode === 'all') {
         audio.setGain(this.gain)
@@ -153,7 +176,7 @@ section {
   }
 }
 
-option, select, input {
+option, select, input, a {
   cursor: pointer;
   pointer-events: auto;
   z-index: 15;
