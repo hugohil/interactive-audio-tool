@@ -37,8 +37,8 @@ export function connectUserMedia (deviceID) {
     source.channelCountMode = 'explicit'
     source.channelInterpretation = 'discrete'
 
-    source.connect(panner)
     panner.connect(gain)
+    source.connect(panner)
     gain.connect(context.destination)
 
     active = true
